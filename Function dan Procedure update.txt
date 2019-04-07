@@ -1,0 +1,57 @@
+=== Function menghitung jumlah pembayaran upah lembur berdasarkan kategori Jam Kerja===
+create or replace function FN_Payment (p_id in varchar2)
+ return number
+ is payment number;
+ paymentByHour number;
+ diff_hours number;
+ salary number;
+begin
+ select (SUM(EXTRACT(HOUR FROM finish_time)) - SUM(EXTRACT(HOUR FROM start_time))), e.salary into diff_hours, salary 
+       from DetailOvertime do join MasterEmployee e 
+       on do.employee_id = e.id
+       where employee_id = p_id
+       group by e.salary;
+ paymentByHour := salary/173;
+ if(diff_hours > 1) then
+   payment := (1.5*paymentByHour)+((diff_hours-1)*paymentByHour*2);
+ else
+   payment := (1.5*paymentByHour);
+ end if; 
+ return payment;
+end;
+
+=== Procedure mengupdate upah lembur yang telah dihitung oleh fungsi FN_Payment ===
+create or replace procedure SP_UpdatePaymentMasterOvertime (mo_id in varchar2, e_id in varchar2)
+is
+ paymentOvertime number;
+begin
+ paymentOvertime := FN_Payment(e_id);
+ update MasterOvertime set payment = paymentOvertime where id = mo_id;
+commit;
+end;
+
+====================================================================================================
+
+=== Function menghitung jumlah jam yang di submit dalam 1 overtime berdasarkan id MasterOvertime ===
+create or replace function FN_UpdateTotalOvertime (mo_id in varchar2)
+ return varchar2
+ is diff_hours number;
+ payment number;
+begin
+ select (SUM(EXTRACT(HOUR FROM finish_time)) - SUM(EXTRACT(HOUR FROM start_time))), mo.payment into diff_hours, payment
+ from DetailOvertime do join MasterOvertime mo
+ on do.overtime_id = mo.id
+ where mo.id = mo_id
+ group by mo.payment;
+return diff_hours;
+end;
+
+=== Procedure mengupdate jumlah jam yang sudah dihitung oleh function FN_UpdateTotalOvertime ===
+create or replace procedure SP_UpdateTotalOvertime (mo_id in varchar2, e_id in varchar2)
+is
+ totalHours number;
+begin
+ totalHours := FN_UpdateTotalOvertimeByHour(mo_id);
+ update MasterOvertime set totalOvertime = totalHours where id = mo_id;
+commit;
+end;

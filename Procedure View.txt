@@ -1,0 +1,180 @@
+create or replace procedure SP_ViewCategoryOvertime
+is
+ cursor c_data is select id, name from CategoryOvertime;
+ c_rec c_data%rowtype;
+
+begin
+ for c_rec in c_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||c_rec.id);
+  dbms_output.put_line('Category : '||c_rec.name);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewDepartment
+is
+ cursor d_data is select id, name from MasterDepartment;
+ d_rec d_data%rowtype;
+
+begin
+ for d_rec in d_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||d_rec.id);
+  dbms_output.put_line('Department Name : '||d_rec.name);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewDetailOvertime
+is
+ cursor d_data is select d.id id, d.submit_date submitDate, d.activity activity, d.start_time startTime, d.finish_time finishTime, d.request_status requestStatus, d.payment payment, c.id category, e.name employee, o.id overtime
+ from DetailOvertime d join CategoryOvertime c
+ on d.category_id = c.id
+ join MasterEmployee e
+ on d.employee_id = e.id
+ join MasterOvertime o
+ on d.overtime_id = o.id;
+ d_rec d_data%rowtype;
+
+begin
+ for d_rec in d_data loop
+  dbms_output.put_line('------------------------------------');
+  dbms_output.put_line('ID : '||d_rec.id);
+  dbms_output.put_line('Date : '||d_rec.submitDate);
+  dbms_output.put_line('Activity : '||d_rec.activity);
+  dbms_output.put_line('Start Hour : '||d_rec.startTime);
+  dbms_output.put_line('Finish Hour : '||d_rec.finishTime);
+  dbms_output.put_line('Request Status : '||d_rec.requestStatus);
+  dbms_output.put_line('Payment : '||d_rec.payment);
+  dbms_output.put_line('Category : '||d_rec.category);
+  dbms_output.put_line('Name Employee : '||d_rec.employee);
+  dbms_output.put_line('ID Overtime : '||d_rec.overtime);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewDistrict
+is
+ cursor ds_data is select d.id as id, d.name as district_name, r.id as regency_id
+ from District d join Regency r
+ on d.regency_id = r.id;
+ ds_rec ds_data%rowtype;
+
+begin
+ for ds_rec in ds_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||ds_rec.id);
+  dbms_output.put_line('District : '||ds_rec.district_name);
+  dbms_output.put_line('Regency ID : '||ds_rec.regency_id);
+ end loop;
+end;
+===========================================================================
+
+create or replace procedure SP_ViewMasterEmployee
+is
+ cursor e_data is select e.id id, e.name name, e.gender gender, e.phone phone, e.email email, e.hire_date hiredate, e.salary salary, e.street street, v.id village, e.manager_id manager, d.id department, j.id job
+ from MasterEmployee e
+ join MasterDepartment d
+ on e.department_id = d.id
+ join MasterJob j
+ on e.job_id = j.id
+ join Village v
+ on e.village_id = v.id;
+ e_rec e_data%rowtype;
+
+begin
+ for e_rec in e_data loop
+  dbms_output.put_line('--------------------------------');
+  dbms_output.put_line('ID : '||e_rec.id);
+  dbms_output.put_line('Nama : '||e_rec.name);
+  dbms_output.put_line('Gender : '||e_rec.gender);
+  dbms_output.put_line('Phone : '||e_rec.phone);
+  dbms_output.put_line('Email : '||e_rec.email);
+  dbms_output.put_line('Hire Date : '||e_rec.hiredate);
+  dbms_output.put_line('Salary : '||e_rec.salary);
+  dbms_output.put_line('Street : '||e_rec.street);
+  dbms_output.put_line('Village ID : '||e_rec.village);
+  dbms_output.put_line('Manager ID : '||e_rec.manager);
+  dbms_output.put_line('Department ID : '||e_rec.department);
+  dbms_output.put_line('Job ID : '||e_rec.job);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewMasterJob
+is
+ cursor j_data is select id, name from MasterJob;
+ j_rec j_data%rowtype;
+
+begin
+ for j_rec in j_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||j_rec.id);
+  dbms_output.put_line('Job : '||j_rec.name);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewProvince
+is
+ cursor p_data is select id, name from Province;
+ p_rec p_data%rowtype;
+
+begin
+ for p_rec in p_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||p_rec.id);
+  dbms_output.put_line('Province : '||p_rec.name);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewRegency
+is
+ cursor r_data is select r.id as id, r.name as regency_name, p.id as province_id
+ from Regency r join Province p
+ on r.province_id = p.id;
+ r_rec r_data%rowtype;
+
+begin
+ for r_rec in r_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||r_rec.id);
+  dbms_output.put_line('Regency : '||r_rec.regency_name);
+  dbms_output.put_line('Province ID : '||r_rec.province_id);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewVillage
+is
+ cursor v_data is select v.id as id, v.name as village_name, d.id as district_id
+ from Village v join District d
+ on v.district_id = d.id;
+ v_rec v_data%rowtype;
+
+begin
+ for v_rec in v_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||v_rec.id);
+  dbms_output.put_line('Village : '||v_rec.village_name);
+  dbms_output.put_line('District ID : '||v_rec.district_id);
+ end loop;
+end;
+==============================================================================
+
+create or replace procedure SP_ViewMasterOvertime
+is
+ cursor o_data is select id, totalOvertime, payment, request_status from MasterOvertime;
+ o_rec o_data%rowtype;
+
+begin
+ for o_rec in o_data loop
+  dbms_output.put_line('-------------------------------');
+  dbms_output.put_line('ID : '||o_rec.id);
+  dbms_output.put_line('Total Overtime : '||o_rec.totalOvertime);
+  dbms_output.put_line('Payment : '||o_rec.payment);
+  dbms_output.put_line('Status Request : '||o_rec.request_status);
+ end loop;
+end;
